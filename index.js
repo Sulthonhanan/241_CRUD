@@ -33,9 +33,30 @@ app.get('/api/mahasiswa', (req, res) => {
   db.query('SELECT * FROM mahasiswa', (err, results) => {
     if (err) {
       console.error('Error executing users:', err);
-      res.status(500).send('Error executing users');
+      res.status(500).json('Error executing users');
       return;
     }
     res.json(results);
   });
+});
+
+app.post('/api/mahasiswa', (req, res) => {
+  const { nama, nim, kelas, prodi } = req.body;
+    const query = 'INSERT INTO mahasiswa (nama, nim, kelas, prodi) VALUES (?, ?, ?, ?)';
+        
+    if (!nama || !nim || !kelas || !prodi) {
+      return res.status(400).json('nama, nim, kelas, dan prodi harus diisi');
+    }
+
+    db.query(
+        'INSERT INTO mahasiswa (nama, nim, kelas, prodi) VALUES (?, ?, ?, ?)',
+        [nama, nim, kelas, prodi],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json ({ message: 'Database Error' });   
+            }
+            res.status(201).json({ message: 'Mahasiswa added successfully', id: result.insertId });
+        }
+    );
 });
